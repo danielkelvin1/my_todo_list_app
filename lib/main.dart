@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:mytodolist/screen/intro_screen.dart';
-import 'package:mytodolist/screen/main_screen.dart';
+import 'package:mytodolist/service/notification_service/notification_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (await Permission.notification.request().isGranted &&
+      await Permission.scheduleExactAlarm.isGranted) {
+    await NotificationService.instance.setup();
+  }
   runApp(const MyApp());
 }
 

@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:mytodolist/model/task_model.dart';
 import 'package:mytodolist/screen/main_screen.dart';
+import 'package:mytodolist/service/notification_service/notification_service.dart';
 import 'package:mytodolist/utils/file_local.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -48,8 +49,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> with validationMixin {
     String time = _timeController.text;
     String notes = _notesController.text;
     const uuid = Uuid();
+    String id = uuid.v1();
     final TaskModel taskModel = TaskModel(
-      id: uuid.v1(),
+      id: id,
       title: title,
       category: category,
       date: date,
@@ -57,6 +59,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> with validationMixin {
       notes: notes,
       isComplete: false,
     );
+
     if (await file.exists()) {
       final contents = await file.readAsString();
       List allNotesJson = json.decode(contents);
@@ -69,6 +72,20 @@ class _AddTaskScreenState extends State<AddTaskScreen> with validationMixin {
       var toJson = json.encode([taskModel.toMap()]);
       file.writeAsString(toJson);
     }
+    DateTime dateNotification = date.convertToDate();
+    TimeOfDay timeNotification = time.convertToTimeOfDay();
+    NotificationService.instance.setNotification(
+      DateTime(
+        dateNotification.year,
+        dateNotification.month,
+        dateNotification.day,
+        timeNotification.hour,
+        timeNotification.minute,
+      ),
+      id,
+      title,
+      notes,
+    );
   }
 
   @override
